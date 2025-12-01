@@ -9,7 +9,7 @@ export default function IntroScreen({ navigation }: any) {
       
       <TouchableOpacity 
         style={styles.button}
-        onPress={() => navigation.navigate('Login')}
+        onPress={() => navigation.navigate('Home')}
       >
         <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
