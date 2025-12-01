@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Habit } from '../../types/types';
+import HomeScreen from './HomeScreen';
 
 export default function HabitDetailScreen({ navigation, route }: any) {
   const { habit } = route.params as { habit: Habit };
@@ -35,6 +36,12 @@ export default function HabitDetailScreen({ navigation, route }: any) {
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate('CreateHabit', { habit })}
+        >
+          <Text style={styles.editIcon}>❌</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.editButton}
