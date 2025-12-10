@@ -1,7 +1,7 @@
 
-  # Habit Tracker
+  # Habitually
 
-  This is a code bundle for  Habit Tracker App.
+  This is a code bundle for  "Habitually", a Habit Tracker App.
 
   ## Running the code
 
