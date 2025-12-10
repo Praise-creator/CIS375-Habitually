@@ -1,9 +1,0 @@
-node_modules/
-.expo/
-.expo-shared/
-dist/
-build/
-.DS_Store
-*.log
-ios/Pods/
-.env
