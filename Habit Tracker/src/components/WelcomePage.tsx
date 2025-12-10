@@ -15,7 +15,7 @@ export function WelcomePage({ onNavigate, theme }: WelcomePageProps) {
           <span className="text-5xl text-white font-bold">H</span>
         </div>
         <h1 className={`mb-3 text-center ${theme === 'dark' ? 'text-white' : 'text-neutral-900'}`}>
-          Habit Tracker
+          Habitually
         </h1>
         <p className={`text-center max-w-xs ${theme === 'dark' ? 'text-neutral-400' : 'text-neutral-500'}`}>
           Build better habits, one day at a time
