@@ -10,6 +10,17 @@ import { HabitDetailPage } from "./components/HabitDetailPage";
 import { CalendarPage } from "./components/CalendarPage";
 import { SettingsPage } from "./components/SettingsPage";
 
+import { loadAppState, saveAppState } from "./services/appStateStorage";
+import {
+   loginAction, 
+   signupAction, 
+   logoutAction, 
+   addHabitAction, 
+   updateHabitAction, 
+   deleteHabitAction, 
+   toggleHabitTodayAction
+} from "./services/appStateActions";
+
 export type Screen =
   | "welcome"
   | "login"
@@ -56,9 +67,8 @@ export interface AppState {
 
 function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
-  const [selectedHabitId, setSelectedHabitId] = useState<
-    string | null
-  >(null);
+  const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
+
   const [appState, setAppState] = useState<AppState>({
     isLoggedIn: false,
     user: null,
@@ -67,117 +77,59 @@ function App() {
     registeredUsers: [],
   });
 
+
+  // Load state from localStorage via service on first mount
   useEffect(() => {
-    const stored = localStorage.getItem("habitTrackerState");
+    const stored = loadAppState();
     if (stored) {
-      const parsedState = JSON.parse(stored);
-      setAppState({
-        ...parsedState,
-        registeredUsers: parsedState.registeredUsers || [], // Ensure registeredUsers exists
-      });
-      if (parsedState.isLoggedIn) {
+      setAppState(stored);
+      if (stored.isLoggedIn) {
         setScreen("home");
       }
     }
   }, []);
 
+  // Save appState to localStorage via service whenever it changes
   useEffect(() => {
-    localStorage.setItem(
-      "habitTrackerState",
-      JSON.stringify(appState),
-    );
+    saveAppState(appState);
   }, [appState]);
 
+
   const login = (name: string) => {
-    setAppState({
-      ...appState,
-      isLoggedIn: true,
-      user: { name, avatar: "👤" },
-    });
+    setAppState((prev) => loginAction(prev, name));
     setScreen("home");
   };
 
-  const signup = (
-    email: string,
-    password: string,
-    name: string,
-  ) => {
-    setAppState({
-      ...appState,
-      isLoggedIn: true,
-      user: { name, avatar: "👤" },
-      registeredUsers: [
-        ...appState.registeredUsers,
-        { email, password, name },
-      ],
-    });
+  const signup = (email: string, password: string, name: string) => {
+    setAppState((prev) => signupAction(prev, email, password, name));
     setScreen("home");
   };
 
   const logout = () => {
-    setAppState({
-      ...appState,
-      isLoggedIn: false,
-      user: null,
-    });
+    setAppState((prev) => logoutAction(prev));
     setScreen("welcome");
   };
 
   const addHabit = (
-    habit: Omit<Habit, "id" | "createdAt" | "completedDates">,
+    habit: Omit<Habit, "id" | "createdAt" | "completedDates">
   ) => {
-    const newHabit: Habit = {
-      ...habit,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      completedDates: [],
-    };
-    setAppState({
-      ...appState,
-      habits: [...appState.habits, newHabit],
-    });
+    setAppState((prev) => addHabitAction(prev, habit));
     setScreen("home");
   };
 
   const updateHabit = (id: string, updates: Partial<Habit>) => {
-    setAppState({
-      ...appState,
-      habits: appState.habits.map((h) =>
-        h.id === id ? { ...h, ...updates } : h,
-      ),
-    });
+    setAppState((prev) => updateHabitAction(prev, id, updates));
   };
 
   const deleteHabit = (id: string) => {
-    setAppState({
-      ...appState,
-      habits: appState.habits.filter((h) => h.id !== id),
-    });
+    setAppState((prev) => deleteHabitAction(prev, id));
     setScreen("home");
   };
 
   const toggleHabitToday = (id: string) => {
-    const today = new Date().toDateString();
-    setAppState({
-      ...appState,
-      habits: appState.habits.map((habit) => {
-        if (habit.id === id) {
-          const isCompletedToday =
-            habit.completedDates.includes(today);
-          return {
-            ...habit,
-            completedDates: isCompletedToday
-              ? habit.completedDates.filter(
-                  (date) => date !== today,
-                )
-              : [...habit.completedDates, today],
-          };
-        }
-        return habit;
-      }),
-    });
+    setAppState((prev) => toggleHabitTodayAction(prev, id));
   };
-
+ 
   const updateProfile = (name: string, avatar: string) => {
     setAppState({
       ...appState,
@@ -314,7 +266,7 @@ function App() {
         return null;
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-8">
       <PhoneFrame theme={appState.theme}>
@@ -322,6 +274,6 @@ function App() {
       </PhoneFrame>
     </div>
   );
-}
+} 
 
 export default App;
